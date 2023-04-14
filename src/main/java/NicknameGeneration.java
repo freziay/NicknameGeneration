@@ -16,7 +16,7 @@ public class NicknameGeneration {
 
     public static void main(String args[]) throws InterruptedException {
         Random random = new Random();
-        String[] texts = new String[100];
+        String[] texts = new String[200];
         for (int i = 0; i < texts.length; i++) {
             texts[i] = generateText("abc", 3 + random.nextInt(3));
             word = texts[i];
