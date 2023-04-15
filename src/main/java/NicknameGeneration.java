@@ -1,6 +1,5 @@
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -9,38 +8,42 @@ public class NicknameGeneration {
     static int countFour = 0;
     static int countFive = 0;
     static String word;
-    private static AtomicInteger atomic3 = new AtomicInteger(0);
-    private static AtomicInteger atomic4 = new AtomicInteger(0);
-    private static AtomicInteger atomic5 = new AtomicInteger(0);
+    public static ArrayList<String> arrayList = new ArrayList<>();
+
+    private static AtomicInteger atomic3 = new AtomicInteger(counThree);
+    private static AtomicInteger atomic4 = new AtomicInteger(countFour);
+    private static AtomicInteger atomic5 = new AtomicInteger(countFive);
 
 
     public static void main(String args[]) throws InterruptedException {
         Random random = new Random();
-        String[] texts = new String[200];
+        String[] texts = new String[10_000];
         for (int i = 0; i < texts.length; i++) {
             texts[i] = generateText("abc", 3 + random.nextInt(3));
             word = texts[i];
-            System.out.println(word);
         }
-        Thread thread3 = new Thread(() -> {
-            for (String text : texts) {
-                if (text.equals(new StringBuffer().append(text).reverse().toString())) {
-                   System.out.println(text + " polindrom");
-                   if(text.length()==3){
-                    atomic3.getAndIncrement();}
-                   if (text.length()==4){
-                    atomic4.getAndIncrement();}
-                   if(text.length()==5){
-                    atomic5.getAndIncrement();}
+        Thread thread1 = new Thread(() -> {
+            for (int i = 0; i < texts.length; i++) {
+
+                if (texts[i].equals(new StringBuffer().append(texts[i]).reverse().toString())) {
+                    String s = texts[i];
+                    String[] words = s.split("");
+                    String one = words[1];
+                    for (int j = 2; j < words.length; j++) {
+                        if (!one.equals(words[j])) {
+                            addList(arrayList, texts[i]);
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
                 }
             }
         });
-        thread3.start();
-        Thread thread4 = new Thread(() -> {
+        Thread thread2 = new Thread(() -> {
             for (int k = 0; k < texts.length; k++) {
                 String s = texts[k];
                 String[] words = s.split("");
-                //   String  d=words[i];
                 boolean isPovtor = true;
                 String one = words[0];
                 for (int j = 1; j < words.length; j++) {
@@ -52,51 +55,62 @@ public class NicknameGeneration {
                     }
                 }
                 if (isPovtor) {
-                    System.out.println(s + " kras ");
-
-                    if(s.length()==3){
-                        atomic3.getAndIncrement();}
-                    if (s.length()==4){
-                        atomic4.getAndIncrement();}
-                    if(s.length()==5){
-                        atomic5.getAndIncrement();}
+                    addList(arrayList, s);
                 }
             }
         });
-        thread4.start();
-        Thread thread5 = new Thread(() -> {
+        Thread thread3 = new Thread(() -> {
             for (int r = 0; r < texts.length; r++) {
                 char[] charArray = texts[r].toCharArray();
                 Arrays.sort(charArray);
                 String sortedString = new String(charArray);
-                for (int j = 0; j < texts.length; j++) {
-                    if (!sortedString.equals(texts[j])) {
-                    } else {
-                        System.out.println(texts[j]+" povtor");
-                        if(sortedString.length()==3){
-                            atomic3.getAndIncrement();}
-                        if (sortedString.length()==4){
-                            atomic4.getAndIncrement();}
-                        if(sortedString.length()==5){
-                            atomic5.getAndIncrement();}
+                for (int j = 0; j < sortedString.length(); j++) {
+                    if (sortedString.equals(texts[j])) {
+                        String s = texts[j];
+                        String[] words = s.split("");
+                        String one = words[0];
+                        for (int i = 1; i < words.length; i++) {
+                            if (one.equals(words[i])) {
+                            } else {
+                                addList(arrayList, s);
+                                break;
+                            }
+                        }
                     }
                 }
             }
         });
-        thread5.start();
-
+        thread1.start();
+        thread1.join();
+        thread2.start();
+        thread2.join();
+        thread3.start();
         thread3.join();
-        thread4.join();
-        thread5.join();
-        System.out.println("Красивых слов с длиной 3:" + atomic3.get() + " шт");
-        System.out.println("Красивых слов с длиной 4:" + atomic4.get() + " шт");
-        System.out.println("Красивых слов с длиной 5:" + atomic5.get() + " шт");
+        for (int k = 0; k < arrayList.size(); k++) {
+            String s = arrayList.get(k);
+            String[] words = s.split("");
+
+            if (words.length == 3) {
+                atomic3.getAndIncrement();
+            }
+
+            if (words.length == 4) {
+                atomic4.getAndIncrement();
+            }
+            if (words.length == 5) {
+                atomic5.getAndIncrement();
+            }
+        }
+
+        System.out.println("Красивых слов с длиной 3: " + atomic3.get() + " шт" +
+                "\r\n" + "Красивых слов с длиной 4: " + atomic4.get() + " шт" + "\r\n" +
+                "Красивых слов с длиной 5: " + atomic5.get() + " шт");
+
     }
-//    public void run() {
-//        if
-//        System.out.println(Thread.currentThread().getName() + "# " +
-//                atomic.getAndIncrement());
-//    }
+
+    public static synchronized void addList(ArrayList<String> arrayList, String string) {
+        arrayList.add(string);
+    }
 
     public static String generateText(String letters, int length) {
         Random random = new Random();
