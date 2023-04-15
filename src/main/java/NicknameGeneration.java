@@ -14,7 +14,6 @@ public class NicknameGeneration {
     private static AtomicInteger atomic4 = new AtomicInteger(countFour);
     private static AtomicInteger atomic5 = new AtomicInteger(countFive);
 
-
     public static void main(String args[]) throws InterruptedException {
         Random random = new Random();
         String[] texts = new String[10_000];
@@ -23,62 +22,16 @@ public class NicknameGeneration {
             word = texts[i];
         }
         Thread thread1 = new Thread(() -> {
-            for (int i = 0; i < texts.length; i++) {
+            polindrom(arrayList, texts);
 
-                if (texts[i].equals(new StringBuffer().append(texts[i]).reverse().toString())) {
-                    String s = texts[i];
-                    String[] words = s.split("");
-                    String one = words[1];
-                    for (int j = 2; j < words.length; j++) {
-                        if (!one.equals(words[j])) {
-                            addList(arrayList, texts[i]);
-                            break;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
         });
         Thread thread2 = new Thread(() -> {
-            for (int k = 0; k < texts.length; k++) {
-                String s = texts[k];
-                String[] words = s.split("");
-                boolean isPovtor = true;
-                String one = words[0];
-                for (int j = 1; j < words.length; j++) {
-                    if (!one.equals(words[j])) {
-                        isPovtor = false;
-                        break;
-                    } else {
-                        one = words[j];
-                    }
-                }
-                if (isPovtor) {
-                    addList(arrayList, s);
-                }
-            }
+            repeatedLetters(arrayList,texts);
+
         });
         Thread thread3 = new Thread(() -> {
-            for (int r = 0; r < texts.length; r++) {
-                char[] charArray = texts[r].toCharArray();
-                Arrays.sort(charArray);
-                String sortedString = new String(charArray);
-                for (int j = 0; j < sortedString.length(); j++) {
-                    if (sortedString.equals(texts[j])) {
-                        String s = texts[j];
-                        String[] words = s.split("");
-                        String one = words[0];
-                        for (int i = 1; i < words.length; i++) {
-                            if (one.equals(words[i])) {
-                            } else {
-                                addList(arrayList, s);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+            repeatInAlphabeticalOrder(arrayList,texts);
+
         });
         thread1.start();
         thread1.join();
@@ -101,13 +54,68 @@ public class NicknameGeneration {
                 atomic5.getAndIncrement();
             }
         }
-
         System.out.println("Красивых слов с длиной 3: " + atomic3.get() + " шт" +
                 "\r\n" + "Красивых слов с длиной 4: " + atomic4.get() + " шт" + "\r\n" +
                 "Красивых слов с длиной 5: " + atomic5.get() + " шт");
+    }
+    public static void polindrom(ArrayList<String> arrayList, String[] texts) {
+        for (int i = 0; i < texts.length; i++) {
+            if (texts[i].equals(new StringBuffer().append(texts[i]).reverse().toString())) {
+                String s = texts[i];
+                String[] words = s.split("");
+                String one = words[1];
+                for (int j = 2; j < words.length; j++) {
+                    if (!one.equals(words[j])) {
+                        addList(arrayList, texts[i]);
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    public static void repeatedLetters(ArrayList<String> arrayList, String[] texts){
+        for (int k = 0; k < texts.length; k++) {
+            String s = texts[k];
+            String[] words = s.split("");
+            boolean isPovtor = true;
+            String one = words[0];
+            for (int j = 1; j < words.length; j++) {
+                if (!one.equals(words[j])) {
+                    isPovtor = false;
+                    break;
+                } else {
+                    one = words[j];
+                }
+            }
+            if (isPovtor) {
+                addList(arrayList, s);
+            }
+        }
+    }
+    public static void repeatInAlphabeticalOrder(ArrayList<String> arrayList, String[] texts){
+        for (int r = 0; r < texts.length; r++) {
+            char[] charArray = texts[r].toCharArray();
+            Arrays.sort(charArray);
+            String sortedString = new String(charArray);
+            for (int j = 0; j < sortedString.length(); j++) {
+                if (sortedString.equals(texts[j])) {
+                    String s = texts[j];
+                    String[] words = s.split("");
+                    String one = words[0];
+                    for (int i = 1; i < words.length; i++) {
+                        if (one.equals(words[i])) {
+                        } else {
+                            addList(arrayList, s);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
     }
-
     public static synchronized void addList(ArrayList<String> arrayList, String string) {
         arrayList.add(string);
     }
